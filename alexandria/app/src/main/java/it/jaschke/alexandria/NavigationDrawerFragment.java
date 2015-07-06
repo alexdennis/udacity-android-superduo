@@ -71,13 +71,12 @@ public class NavigationDrawerFragment extends Fragment {
         mUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false);
 
 
-
         if (savedInstanceState != null) {
             mCurrentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
             mFromSavedInstanceState = true;
-        }else{
+        } else {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            mCurrentSelectedPosition = Integer.parseInt(prefs.getString("pref_startFragment","0"));
+            mCurrentSelectedPosition = Integer.parseInt(prefs.getString("pref_startFragment", "0"));
             selectItem(mCurrentSelectedPosition);
         }
 
