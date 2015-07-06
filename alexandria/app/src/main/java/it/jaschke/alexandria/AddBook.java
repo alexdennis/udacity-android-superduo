@@ -19,6 +19,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import it.jaschke.alexandria.data.AlexandriaContract;
 import it.jaschke.alexandria.services.BookService;
@@ -27,6 +29,7 @@ import it.jaschke.alexandria.services.DownloadImage;
 
 public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "INTENT_TO_SCAN_ACTIVITY";
+    public static final int REQUEST_CODE = 0x0000c0de; // Only use bottom 16 bits
     private EditText ean;
     private final int LOADER_ID = 1;
     private View rootView;
@@ -78,15 +81,12 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                     clearFields();
                     return;
                 }
-                //Once we have an ISBN, start a book intent
-                Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean);
-                bookIntent.setAction(BookService.FETCH_BOOK);
-                getActivity().startService(bookIntent);
-                AddBook.this.restartLoader();
+                searchBookByISBN(ean);
+
             }
         });
 
+        final Fragment f = this;
         rootView.findViewById(R.id.scan_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -96,12 +96,10 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 // Hint: Use a Try/Catch block to handle the Intent dispatch gracefully, if you
                 // are using an external app.
                 //when you're done, remove the toast below.
-                Context context = getActivity();
-                CharSequence text = "This button should let you scan a book for its barcode!";
-                int duration = Toast.LENGTH_SHORT;
 
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
+                Intent intentScan = new Intent("com.google.zxing.client.android.SCAN");
+                intentScan.addCategory(Intent.CATEGORY_DEFAULT);
+                f.startActivityForResult(intentScan, REQUEST_CODE);
 
             }
         });
@@ -130,6 +128,29 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         }
 
         return rootView;
+    }
+
+    private void searchBookByISBN(String ean) {
+        Context context = getActivity();
+        Intent bookIntent = new Intent(context, BookService.class);
+        bookIntent.putExtra(BookService.EAN, ean);
+        bookIntent.setAction(BookService.FETCH_BOOK);
+        context.startService(bookIntent);
+        AddBook.this.restartLoader();
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+        if (scanResult != null) {
+            // handle scan result
+            searchBookByISBN(scanResult.getContents());
+
+        } else {
+            CharSequence text = getResources().getString(R.string.error_failed_scan);
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(getActivity(), text, duration);
+            toast.show();
+        }
     }
 
     private void restartLoader(){
