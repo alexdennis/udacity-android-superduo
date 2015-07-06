@@ -3,8 +3,11 @@ package it.jaschke.alexandria.services;
 import android.app.IntentService;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -16,6 +19,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -37,6 +42,17 @@ public class BookService extends IntentService {
     public static final String DELETE_BOOK = "it.jaschke.alexandria.services.action.DELETE_BOOK";
 
     public static final String EAN = "it.jaschke.alexandria.services.extra.EAN";
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({BOOK_SERVICE_STATUS_OK, BOOK_SERVICE_STATUS_SERVER_DOWN, BOOK_SERVICE_STATUS_SERVER_INVALID,
+            BOOK_SERVICE_STATUS_UNKNOWN, BOOK_SERVICE_STATUS_INVALID})
+    public @interface BookServiceStatus {}
+
+    public static final int BOOK_SERVICE_STATUS_OK = 0;
+    public static final int BOOK_SERVICE_STATUS_SERVER_DOWN = 1;
+    public static final int BOOK_SERVICE_STATUS_SERVER_INVALID = 2;
+    public static final int BOOK_SERVICE_STATUS_UNKNOWN = 3;
+    public static final int BOOK_SERVICE_STATUS_INVALID = 4;
 
     public BookService() {
         super("Alexandria");
@@ -76,24 +92,15 @@ public class BookService extends IntentService {
             return;
         }
 
-        Cursor bookEntry = getContentResolver().query(
-                AlexandriaContract.BookEntry.buildBookUri(Long.parseLong(ean)),
-                null, // leaving "columns" null just returns all the columns.
-                null, // cols for "where" clause
-                null, // values for "where" clause
-                null  // sort order
-        );
-
-        if (bookEntry.getCount() > 0) {
-            bookEntry.close();
+        if (isBookAlreadyInDB(ean)) {
             return;
         }
-
-        bookEntry.close();
 
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         String bookJsonString = null;
+
+        setBookServiceStatus(BOOK_SERVICE_STATUS_UNKNOWN);
 
         try {
             final String FORECAST_BASE_URL = "https://www.googleapis.com/books/v1/volumes?";
@@ -114,6 +121,7 @@ public class BookService extends IntentService {
             InputStream inputStream = urlConnection.getInputStream();
             StringBuffer buffer = new StringBuffer();
             if (inputStream == null) {
+                setBookServiceStatus(BOOK_SERVICE_STATUS_SERVER_DOWN);
                 return;
             }
 
@@ -125,11 +133,14 @@ public class BookService extends IntentService {
             }
 
             if (buffer.length() == 0) {
+                setBookServiceStatus(BOOK_SERVICE_STATUS_SERVER_DOWN);
                 return;
             }
             bookJsonString = buffer.toString();
         } catch (Exception e) {
             Log.e(LOG_TAG, "Error ", e);
+            setBookServiceStatus(BOOK_SERVICE_STATUS_SERVER_DOWN);
+            return;
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -144,6 +155,10 @@ public class BookService extends IntentService {
 
         }
 
+        handleResponse(ean, bookJsonString);
+    }
+
+    private void handleResponse(String ean, String bookJsonString) {
         final String ITEMS = "items";
 
         final String VOLUME_INFO = "volumeInfo";
@@ -161,7 +176,9 @@ public class BookService extends IntentService {
             JSONArray bookArray;
             if (bookJson.has(ITEMS)) {
                 bookArray = bookJson.getJSONArray(ITEMS);
+                setBookServiceStatus(BOOK_SERVICE_STATUS_OK);
             } else {
+                setBookServiceStatus(BOOK_SERVICE_STATUS_INVALID);
                 Intent messageIntent = new Intent(MainActivity.MESSAGE_EVENT);
                 messageIntent.putExtra(MainActivity.MESSAGE_KEY, getResources().getString(R.string.not_found));
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(messageIntent);
@@ -198,7 +215,29 @@ public class BookService extends IntentService {
 
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Error ", e);
+            setBookServiceStatus(BOOK_SERVICE_STATUS_SERVER_INVALID);
         }
+    }
+
+    private boolean isBookAlreadyInDB(String ean) {
+        Cursor bookEntry = getContentResolver().query(
+                AlexandriaContract.BookEntry.buildBookUri(Long.parseLong(ean)),
+                null, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                null  // sort order
+        );
+
+        if (bookEntry != null) {
+            if (bookEntry.getCount() > 0) {
+                bookEntry.close();
+                return true;
+            }
+
+            bookEntry.close();
+        }
+
+        return false;
     }
 
     private void writeBackBook(String ean, String title, String subtitle, String desc, String imgUrl) {
@@ -229,5 +268,12 @@ public class BookService extends IntentService {
             getContentResolver().insert(AlexandriaContract.CategoryEntry.CONTENT_URI, values);
             values = new ContentValues();
         }
+    }
+
+    private void setBookServiceStatus(@BookServiceStatus int status) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(BookService.this);
+        SharedPreferences.Editor e = prefs.edit();
+        e.putInt(getString(R.string.pref_book_service_status_key), status);
+        e.commit();
     }
 }

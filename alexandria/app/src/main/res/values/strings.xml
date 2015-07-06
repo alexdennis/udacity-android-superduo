@@ -25,6 +25,8 @@
     <string name="back_button">go back</string>
     <string name="share_text">A must read book: </string>
 
+    <string name="pref_book_service_status_key">book_service_status</string>
+
     <string name="error_failed_scan">Failed to scan ISBN</string>
 
     <!-- TODO: Remove or change this placeholder text -->
