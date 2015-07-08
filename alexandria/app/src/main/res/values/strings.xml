@@ -24,10 +24,16 @@
     <string name="action_share">Share</string>
     <string name="back_button">go back</string>
     <string name="share_text">A must read book: </string>
+    <string name="isbn_13_prefix">978</string>
 
     <string name="pref_book_service_status_key">book_service_status</string>
 
     <string name="error_failed_scan">Failed to scan ISBN</string>
+    <string name="error_no_network">Failed to scan ISBN. Network unavailable</string>
+    <string name="error_server_invalid">Failed to scan ISBN. Server returned an error.</string>
+    <string name="error_server_down">Failed to scan ISBN. Server unavailable.</string>
+    <string name="error_isbn_invalid">ISBN is invalid</string>
+    <string name="error_no_scanner_app">No app installed to handle scan</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="about_text">This application gets book information from a Google API. All titles, cover images, and author information come from there.

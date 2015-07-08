@@ -3,8 +3,11 @@ package it.jaschke.alexandria;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -21,6 +24,8 @@ import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+
+import java.util.List;
 
 import it.jaschke.alexandria.data.AlexandriaContract;
 import it.jaschke.alexandria.services.BookService;
@@ -65,13 +70,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
             @Override
             public void afterTextChanged(Editable s) {
-                String ean = s.toString();
-                //catch isbn10 numbers
-                if (ean.length() == 10 && !ean.startsWith("978")) {
-                    ean = "978" + ean;
-                }
+                String ean = Utility.fixEanforISBN13(getActivity(), s.toString());
                 if (ean.length() < 13) {
-                    clearFields();
                     return;
                 }
                 searchBookByISBN(ean);
@@ -92,7 +92,12 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
                 Intent intentScan = new Intent("com.google.zxing.client.android.SCAN");
                 intentScan.addCategory(Intent.CATEGORY_DEFAULT);
-                f.startActivityForResult(intentScan, REQUEST_CODE);
+                if (canSystemHandleIntent(intentScan)) {
+                    f.startActivityForResult(intentScan, REQUEST_CODE);
+                } else {
+                    Snackbar.make(rootView, R.string.error_no_scanner_app, Snackbar.LENGTH_LONG)
+                            .show();
+                }
 
             }
         });
@@ -101,6 +106,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             @Override
             public void onClick(View view) {
                 ean.setText("");
+                clearFields();
             }
         });
 
@@ -111,6 +117,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 bookIntent.putExtra(BookService.EAN, ean.getText().toString());
                 bookIntent.setAction(BookService.DELETE_BOOK);
                 getActivity().startService(bookIntent);
+                clearFields();
                 ean.setText("");
             }
         });
@@ -121,6 +128,12 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         }
 
         return rootView;
+    }
+
+    private boolean canSystemHandleIntent(Intent intent) {
+        PackageManager pm = getActivity().getPackageManager();
+        List<ResolveInfo> availableApps = pm.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        return (availableApps != null && availableApps.size() > 0);
     }
 
     private void searchBookByISBN(String ean) {
@@ -152,26 +165,30 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
     @Override
     public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if (ean.getText().length() == 0) {
+        if (ean == null || ean.getText().length() == 0) {
             return null;
         }
-        String eanStr = ean.getText().toString();
-        if (eanStr.length() == 10 && !eanStr.startsWith("978")) {
-            eanStr = "978" + eanStr;
+        String eanStr = Utility.fixEanforISBN13(getActivity(), ean.getText().toString());
+        long eanLong = Utility.convertEanStringToLong(eanStr);
+        if (eanLong == -1) {
+            return null;
         }
+
         return new CursorLoader(
                 getActivity(),
-                AlexandriaContract.BookEntry.buildFullBookUri(Long.parseLong(eanStr)),
+                AlexandriaContract.BookEntry.buildFullBookUri(eanLong),
                 null,
                 null,
                 null,
                 null
         );
+
     }
 
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor data) {
         if (!data.moveToFirst()) {
+            showSnackbar();
             return;
         }
 
@@ -217,5 +234,26 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         activity.setTitle(R.string.scan);
+    }
+
+    private void showSnackbar() {
+        int message = R.string.error_failed_scan;
+        if (!Utility.isConnected(getActivity())) {
+            message = R.string.error_no_network;
+        } else {
+            switch (Utility.getBookServiceStatus(getActivity())) {
+                case BookService.BOOK_SERVICE_STATUS_SERVER_INVALID:
+                    message = R.string.error_server_invalid;
+                    break;
+                case BookService.BOOK_SERVICE_STATUS_SERVER_DOWN:
+                    message = R.string.error_server_down;
+                    break;
+                case BookService.BOOK_SERVICE_STATUS_INVALID:
+                    message = R.string.not_found;
+                    break;
+            }
+        }
+        Snackbar.make(rootView, message, Snackbar.LENGTH_LONG)
+                .show();
     }
 }

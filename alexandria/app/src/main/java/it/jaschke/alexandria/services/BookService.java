@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -24,8 +23,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import it.jaschke.alexandria.MainActivity;
 import it.jaschke.alexandria.R;
+import it.jaschke.alexandria.Utility;
 import it.jaschke.alexandria.data.AlexandriaContract;
 
 
@@ -76,9 +75,12 @@ public class BookService extends IntentService {
      * Handle action Foo in the provided background thread with the provided
      * parameters.
      */
-    private void deleteBook(String ean) {
-        if (ean != null) {
-            getContentResolver().delete(AlexandriaContract.BookEntry.buildBookUri(Long.parseLong(ean)), null, null);
+    private void deleteBook(String eanStr) {
+        if (eanStr != null) {
+            long longEan = Utility.convertEanStringToLong(eanStr);
+            if (longEan != -1) {
+                getContentResolver().delete(AlexandriaContract.BookEntry.buildBookUri(longEan), null, null);
+            }
         }
     }
 
@@ -88,7 +90,7 @@ public class BookService extends IntentService {
      */
     private void fetchBook(String ean) {
 
-        if (ean.length() != 13) {
+        if (ean == null || ean.length() != 13) {
             return;
         }
 
@@ -155,10 +157,10 @@ public class BookService extends IntentService {
 
         }
 
-        handleResponse(ean, bookJsonString);
+        parseJSONResponse(ean, bookJsonString);
     }
 
-    private void handleResponse(String ean, String bookJsonString) {
+    private void parseJSONResponse(String ean   , String bookJsonString) {
         final String ITEMS = "items";
 
         final String VOLUME_INFO = "volumeInfo";
@@ -179,9 +181,6 @@ public class BookService extends IntentService {
                 setBookServiceStatus(BOOK_SERVICE_STATUS_OK);
             } else {
                 setBookServiceStatus(BOOK_SERVICE_STATUS_INVALID);
-                Intent messageIntent = new Intent(MainActivity.MESSAGE_EVENT);
-                messageIntent.putExtra(MainActivity.MESSAGE_KEY, getResources().getString(R.string.not_found));
-                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(messageIntent);
                 return;
             }
 
@@ -273,6 +272,7 @@ public class BookService extends IntentService {
     private void setBookServiceStatus(@BookServiceStatus int status) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(BookService.this);
         SharedPreferences.Editor e = prefs.edit();
+        Log.d(LOG_TAG, "Status = " + status);
         e.putInt(getString(R.string.pref_book_service_status_key), status);
         e.commit();
     }
