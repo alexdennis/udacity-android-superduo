@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
     <string name="app_name">Football Scores</string>
     <string name="hello_world">Hello world!</string>
@@ -8,11 +8,6 @@
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
     <string name="tomorrow">Tomorrow</string>
-    <string name="champions_league">UEFA Champions League</string>
-    <string name="bundesliga">Bundesliga</string>
-    <string name="premierleague">Premier League</string>
-    <string name="primeradivison">Primera Division</string>
-    <string name="seriaa">Serie A</string>
     <string name="matchday_text">Match day</string>
     <string name="group_stage_text">Group stages</string>
     <string name="first_knockout_round">First knockout round</string>
@@ -22,6 +17,37 @@
     <string name="share_text">Share</string>
     <string name="about">About</string>
     <string name="title_activity_about">AboutActivity</string>
+    <string name="date_format_ymd" translatable="false">yyyy-MM-dd</string>
+    <string name="date_format_dayoftheweek" translatable="false">EEEE</string>
+
+    <string name="format_group_stages">
+        Group Stages, Matchday : <xliff:g id="match_day">%1$s</xliff:g>
+    </string>
+    <string name="format_match_day">
+        Matchday : <xliff:g id="match_day">%1$s</xliff:g>
+    </string>
+    <string name="format_scores">
+        <xliff:g id="match_day">%1$s</xliff:g> - <xliff:g id="match_day">%2$s</xliff:g>
+    </string>
+
+    <string name="team_arsenal">Arsenal London FC</string>
+    <string name="team_manchester_united">Manchester United FC</string>
+    <string name="team_swansea_city">Swansea City</string>
+    <string name="team_leicester_city">Leicester City</string>
+    <string name="team_everton">Everton FC</string>
+    <string name="team_west_ham">West Ham United FC</string>
+    <string name="team_tottenham_hotspur">Tottenham Hotspur FC</string>
+    <string name="team_west_bromwich_albion">West Bromwich Albion</string>
+    <string name="team_sunderland">Sunderland AFC</string>
+    <string name="team_stoke_city">Stoke City FC</string>
+    
+    <string name="league_serie_a">Serie A</string>
+    <string name="league_premier_league">Premier League</string>
+    <string name="league_champions_league">UEFA Champions League</string>
+    <string name="league_primera_division">Primera Division</string>
+    <string name="league_bundesliga">Bundesliga</string>
+    <string name="league_unknown">Unknown League. Please report</string>
+    
     <string name="about_text">
         This Application get Football Matches Score for the Premier League,Seria A,Bundesliga,Primera Division
         and the Uefa Champions League.
