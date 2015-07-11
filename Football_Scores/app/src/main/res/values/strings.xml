@@ -64,6 +64,8 @@
         League : <xliff:g id="time">%1$s</xliff:g>
     </string>
 
+    <string name="title_widget_scores">Football Scores</string>
+
     <string name="about_text">
         This Application get Football Matches Score for the Premier League,Seria A,Bundesliga,Primera Division
         and the Uefa Champions League.

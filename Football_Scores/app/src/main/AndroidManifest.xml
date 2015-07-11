@@ -35,6 +35,28 @@
                 android:value="barqsoft.footballscores.MainActivity" />
         </activity>
         <service android:name=".service.FetchScoresService" />
+
+        <receiver
+            android:name=".widget.ScoresWidgetProvider"
+            android:enabled="@bool/widget_scores_enabled"
+            android:label="@string/title_widget_scores" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.carltondennis.android.sunshine.ACTION_DATA_UPDATED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_scores" />
+        </receiver>
+
+        <service
+            android:name=".widget.ScoresWidgetRemoteViewsService"
+            android:enabled="@bool/widget_scores_enabled"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" >
+        </service>
+
     </application>
 
 </manifest>
