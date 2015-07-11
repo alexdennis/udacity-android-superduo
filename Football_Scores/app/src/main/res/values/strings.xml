@@ -47,7 +47,23 @@
     <string name="league_primera_division">Primera Division</string>
     <string name="league_bundesliga">Bundesliga</string>
     <string name="league_unknown">Unknown League. Please report</string>
-    
+
+    <string name="a11y_away_team">
+        Away Team : <xliff:g id="team">%1$s</xliff:g>
+    </string>
+    <string name="a11y_home_team">
+        Home Team : <xliff:g id="team">%1$s</xliff:g>
+    </string>
+    <string name="a11y_score">
+        Score : <xliff:g id="score">%1$s</xliff:g>
+    </string>
+    <string name="a11y_match_time">
+        Match Time : <xliff:g id="time">%1$s</xliff:g>
+    </string>
+    <string name="a11y_league">
+        League : <xliff:g id="time">%1$s</xliff:g>
+    </string>
+
     <string name="about_text">
         This Application get Football Matches Score for the Premier League,Seria A,Bundesliga,Primera Division
         and the Uefa Champions League.

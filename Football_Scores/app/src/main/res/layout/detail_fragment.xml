@@ -49,6 +49,7 @@
             android:paddingRight="@dimen/share_button_margin"
             android:paddingStart="@dimen/share_button_margin"
             android:text="@string/share_text"
+            android:contentDescription="@string/share_text"
             tools:ignore="NewApi" />
     </FrameLayout>
 
