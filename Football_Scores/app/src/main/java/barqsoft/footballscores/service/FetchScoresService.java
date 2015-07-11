@@ -22,17 +22,17 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.Vector;
 
-import barqsoft.footballscores.DatabaseContract;
+import barqsoft.footballscores.data.DatabaseContract;
 import barqsoft.footballscores.R;
 
 /**
  * Created by yehya khaled on 3/2/2015.
  */
-public class myFetchService extends IntentService {
-    public static final String LOG_TAG = "myFetchService";
+public class FetchScoresService extends IntentService {
+    public static final String LOG_TAG = "FetchScoresService";
 
-    public myFetchService() {
-        super("myFetchService");
+    public FetchScoresService() {
+        super("FetchScoresService");
     }
 
     @Override
