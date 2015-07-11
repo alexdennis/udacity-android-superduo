@@ -3,10 +3,12 @@ package it.jaschke.alexandria;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -32,13 +34,18 @@ import it.jaschke.alexandria.services.BookService;
 import it.jaschke.alexandria.services.DownloadImage;
 
 
-public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
+        SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "INTENT_TO_SCAN_ACTIVITY";
     public static final int REQUEST_CODE = 0x0000c0de; // Only use bottom 16 bits
-    private EditText ean;
+
     private final int LOADER_ID = 1;
-    private View rootView;
     private final String EAN_CONTENT = "eanContent";
+
+    private EditText mEanView;
+    private View mRootView;
+    private boolean mShowSnackbar = false;
+    private Snackbar mSnackbar;
 
     public AddBook() {
     }
@@ -46,18 +53,18 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (ean != null) {
-            outState.putString(EAN_CONTENT, ean.getText().toString());
+        if (mEanView != null) {
+            outState.putString(EAN_CONTENT, mEanView.getText().toString());
         }
     }
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        rootView = inflater.inflate(R.layout.fragment_add_book, container, false);
-        ean = (EditText) rootView.findViewById(R.id.ean);
+        mRootView = inflater.inflate(R.layout.fragment_add_book, container, false);
+        mEanView = (EditText) mRootView.findViewById(R.id.ean);
 
-        ean.addTextChangedListener(new TextWatcher() {
+        mEanView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 //no need
@@ -80,7 +87,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         });
 
         final Fragment f = this;
-        rootView.findViewById(R.id.scan_button).setOnClickListener(new View.OnClickListener() {
+        mRootView.findViewById(R.id.scan_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // This is the callback method that the system will invoke when your button is
@@ -95,39 +102,39 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 if (canSystemHandleIntent(intentScan)) {
                     f.startActivityForResult(intentScan, REQUEST_CODE);
                 } else {
-                    Snackbar.make(rootView, R.string.error_no_scanner_app, Snackbar.LENGTH_LONG)
+                    Snackbar.make(mRootView, R.string.error_no_scanner_app, Snackbar.LENGTH_LONG)
                             .show();
                 }
 
             }
         });
 
-        rootView.findViewById(R.id.save_button).setOnClickListener(new View.OnClickListener() {
+        mRootView.findViewById(R.id.save_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ean.setText("");
+                mEanView.setText("");
                 clearFields();
             }
         });
 
-        rootView.findViewById(R.id.delete_button).setOnClickListener(new View.OnClickListener() {
+        mRootView.findViewById(R.id.delete_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean.getText().toString());
+                bookIntent.putExtra(BookService.EAN, mEanView.getText().toString());
                 bookIntent.setAction(BookService.DELETE_BOOK);
                 getActivity().startService(bookIntent);
                 clearFields();
-                ean.setText("");
+                mEanView.setText("");
             }
         });
 
         if (savedInstanceState != null) {
-            ean.setText(savedInstanceState.getString(EAN_CONTENT));
-            ean.setHint("");
+            mEanView.setText(savedInstanceState.getString(EAN_CONTENT));
+            mEanView.setHint("");
         }
 
-        return rootView;
+        return mRootView;
     }
 
     private boolean canSystemHandleIntent(Intent intent) {
@@ -138,6 +145,10 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
     private void searchBookByISBN(String ean) {
         Context context = getActivity();
+
+        mShowSnackbar = false;
+        Utility.resetBookServiceStatus(context);
+
         Intent bookIntent = new Intent(context, BookService.class);
         bookIntent.putExtra(BookService.EAN, ean);
         bookIntent.setAction(BookService.FETCH_BOOK);
@@ -165,10 +176,10 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
     @Override
     public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if (ean == null || ean.getText().length() == 0) {
+        if (mEanView == null || mEanView.getText().length() == 0) {
             return null;
         }
-        String eanStr = Utility.fixEanforISBN13(getActivity(), ean.getText().toString());
+        String eanStr = Utility.fixEanforISBN13(getActivity(), mEanView.getText().toString());
         long eanLong = Utility.convertEanStringToLong(eanStr);
         if (eanLong == -1) {
             return null;
@@ -188,31 +199,34 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor data) {
         if (!data.moveToFirst()) {
-            showSnackbar();
+            mShowSnackbar = true;
             return;
         }
 
+        mShowSnackbar = false;
+        hideSnackbar();
+
         String bookTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
-        ((TextView) rootView.findViewById(R.id.bookTitle)).setText(bookTitle);
+        ((TextView) mRootView.findViewById(R.id.bookTitle)).setText(bookTitle);
 
         String bookSubTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));
-        ((TextView) rootView.findViewById(R.id.bookSubTitle)).setText(bookSubTitle);
+        ((TextView) mRootView.findViewById(R.id.bookSubTitle)).setText(bookSubTitle);
 
         String authors = data.getString(data.getColumnIndex(AlexandriaContract.AuthorEntry.AUTHOR));
         String[] authorsArr = authors.split(",");
-        ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
-        ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",", "\n"));
+        ((TextView) mRootView.findViewById(R.id.authors)).setLines(authorsArr.length);
+        ((TextView) mRootView.findViewById(R.id.authors)).setText(authors.replace(",", "\n"));
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
         if (Patterns.WEB_URL.matcher(imgUrl).matches()) {
-            new DownloadImage((ImageView) rootView.findViewById(R.id.bookCover)).execute(imgUrl);
-            rootView.findViewById(R.id.bookCover).setVisibility(View.VISIBLE);
+            new DownloadImage((ImageView) mRootView.findViewById(R.id.bookCover)).execute(imgUrl);
+            mRootView.findViewById(R.id.bookCover).setVisibility(View.VISIBLE);
         }
 
         String categories = data.getString(data.getColumnIndex(AlexandriaContract.CategoryEntry.CATEGORY));
-        ((TextView) rootView.findViewById(R.id.categories)).setText(categories);
+        ((TextView) mRootView.findViewById(R.id.categories)).setText(categories);
 
-        rootView.findViewById(R.id.save_button).setVisibility(View.VISIBLE);
-        rootView.findViewById(R.id.delete_button).setVisibility(View.VISIBLE);
+        mRootView.findViewById(R.id.save_button).setVisibility(View.VISIBLE);
+        mRootView.findViewById(R.id.delete_button).setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -221,13 +235,13 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     }
 
     private void clearFields() {
-        ((TextView) rootView.findViewById(R.id.bookTitle)).setText("");
-        ((TextView) rootView.findViewById(R.id.bookSubTitle)).setText("");
-        ((TextView) rootView.findViewById(R.id.authors)).setText("");
-        ((TextView) rootView.findViewById(R.id.categories)).setText("");
-        rootView.findViewById(R.id.bookCover).setVisibility(View.INVISIBLE);
-        rootView.findViewById(R.id.save_button).setVisibility(View.INVISIBLE);
-        rootView.findViewById(R.id.delete_button).setVisibility(View.INVISIBLE);
+        ((TextView) mRootView.findViewById(R.id.bookTitle)).setText("");
+        ((TextView) mRootView.findViewById(R.id.bookSubTitle)).setText("");
+        ((TextView) mRootView.findViewById(R.id.authors)).setText("");
+        ((TextView) mRootView.findViewById(R.id.categories)).setText("");
+        mRootView.findViewById(R.id.bookCover).setVisibility(View.INVISIBLE);
+        mRootView.findViewById(R.id.save_button).setVisibility(View.INVISIBLE);
+        mRootView.findViewById(R.id.delete_button).setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -236,24 +250,52 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         activity.setTitle(R.string.scan);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        PreferenceManager.getDefaultSharedPreferences(getActivity()).registerOnSharedPreferenceChangeListener(this);
+
+    }
+
+    @Override
+    public void onPause() {
+        PreferenceManager.getDefaultSharedPreferences(getActivity()).unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
+    }
+
     private void showSnackbar() {
-        int message = R.string.error_failed_scan;
-        if (!Utility.isConnected(getActivity())) {
-            message = R.string.error_no_network;
-        } else {
-            switch (Utility.getBookServiceStatus(getActivity())) {
-                case BookService.BOOK_SERVICE_STATUS_SERVER_INVALID:
-                    message = R.string.error_server_invalid;
-                    break;
-                case BookService.BOOK_SERVICE_STATUS_SERVER_DOWN:
-                    message = R.string.error_server_down;
-                    break;
-                case BookService.BOOK_SERVICE_STATUS_INVALID:
-                    message = R.string.not_found;
-                    break;
+        if (mShowSnackbar) {
+            int message = R.string.error_failed_scan;
+            if (!Utility.isConnected(getActivity())) {
+                message = R.string.error_no_network;
+            } else {
+                switch (Utility.getBookServiceStatus(getActivity())) {
+                    case BookService.BOOK_SERVICE_STATUS_SERVER_INVALID:
+                        message = R.string.error_server_invalid;
+                        break;
+                    case BookService.BOOK_SERVICE_STATUS_SERVER_DOWN:
+                        message = R.string.error_server_down;
+                        break;
+                    case BookService.BOOK_SERVICE_STATUS_INVALID:
+                        message = R.string.not_found;
+                        break;
+                }
             }
+            mSnackbar = Snackbar.make(mRootView, message, Snackbar.LENGTH_LONG);
+            mSnackbar.show();
         }
-        Snackbar.make(rootView, message, Snackbar.LENGTH_LONG)
-                .show();
+    }
+
+    private void hideSnackbar() {
+        if (mSnackbar != null) {
+            mSnackbar.dismiss();
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.pref_book_service_status_key))) {
+            showSnackbar();
+        }
     }
 }

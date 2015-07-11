@@ -26,6 +26,13 @@ public class Utility {
         return prefs.getInt(context.getString(R.string.pref_book_service_status_key), BookService.BOOK_SERVICE_STATUS_UNKNOWN);
     }
 
+    public static void resetBookServiceStatus(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor e = prefs.edit();
+        e.putInt(context.getString(R.string.pref_book_service_status_key), BookService.BOOK_SERVICE_STATUS_UNKNOWN);
+        e.apply();
+    }
+
     public static String fixEanforISBN13(Context context, String ean) {
         String isbn13prefix = context.getResources().getString(R.string.isbn_13_prefix);
         //catch isbn10 numbers
