@@ -17,6 +17,7 @@
     <string name="share_text">Share</string>
     <string name="about">About</string>
     <string name="title_activity_about">About</string>
+
     <string name="date_format_ymd" translatable="false">yyyy-MM-dd</string>
     <string name="date_format_dayoftheweek" translatable="false">EEEE</string>
 
@@ -32,22 +33,22 @@
         <xliff:g id="match_day">%1$s</xliff:g> - <xliff:g id="match_day">%2$s</xliff:g>
     </string>
 
-    <string name="team_arsenal">Arsenal London FC</string>
-    <string name="team_manchester_united">Manchester United FC</string>
-    <string name="team_swansea_city">Swansea City</string>
-    <string name="team_leicester_city">Leicester City</string>
-    <string name="team_everton">Everton FC</string>
-    <string name="team_west_ham">West Ham United FC</string>
-    <string name="team_tottenham_hotspur">Tottenham Hotspur FC</string>
-    <string name="team_west_bromwich_albion">West Bromwich Albion</string>
-    <string name="team_sunderland">Sunderland AFC</string>
-    <string name="team_stoke_city">Stoke City FC</string>
+    <string name="team_arsenal" translatable="false">Arsenal London FC</string>
+    <string name="team_manchester_united" translatable="false">Manchester United FC</string>
+    <string name="team_swansea_city" translatable="false">Swansea City</string>
+    <string name="team_leicester_city" translatable="false">Leicester City</string>
+    <string name="team_everton" translatable="false">Everton FC</string>
+    <string name="team_west_ham" translatable="false">West Ham United FC</string>
+    <string name="team_tottenham_hotspur" translatable="false">Tottenham Hotspur FC</string>
+    <string name="team_west_bromwich_albion" translatable="false">West Bromwich Albion</string>
+    <string name="team_sunderland" translatable="false">Sunderland AFC</string>
+    <string name="team_stoke_city" translatable="false">Stoke City FC</string>
 
-    <string name="league_serie_a">Serie A</string>
-    <string name="league_premier_league">Premier League</string>
-    <string name="league_champions_league">UEFA Champions League</string>
-    <string name="league_primera_division">Primera Division</string>
-    <string name="league_bundesliga">Bundesliga</string>
+    <string name="league_serie_a" translatable="false">Serie A</string>
+    <string name="league_premier_league" translatable="false">Premier League</string>
+    <string name="league_champions_league" translatable="false">UEFA Champions League</string>
+    <string name="league_primera_division" translatable="false">Primera Division</string>
+    <string name="league_bundesliga" translatable="false">Bundesliga</string>
     <string name="league_unknown">Unknown League. Please report</string>
 
     <string name="a11y_away_team">
