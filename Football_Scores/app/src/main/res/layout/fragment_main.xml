@@ -15,5 +15,14 @@
         android:layout_height="match_parent"
         android:id="@+id/scores_list"
         android:divider="@android:color/transparent"
-        android:dividerHeight="15sp" />
+        android:dividerHeight="@dimen/list_item_divider_height" />
+
+    <TextView
+        android:id="@+id/empty_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:fontFamily="sans-serif-condensed"
+        android:textAppearance="?android:textAppearanceLarge"
+        android:text="@string/no_scores"/>
 </FrameLayout>
