@@ -42,7 +42,7 @@
             android:label="@string/title_widget_scores" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.carltondennis.android.sunshine.ACTION_DATA_UPDATED" />
+                <action android:name="barqsoft.footballscores.ACTION_DATA_UPDATED" />
             </intent-filter>
 
             <meta-data

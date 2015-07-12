@@ -31,6 +31,8 @@ import barqsoft.footballscores.R;
 public class FetchScoresService extends IntentService {
     public static final String LOG_TAG = "FetchScoresService";
 
+    public static final String ACTION_DATA_UPDATED = "barqsoft.footballscores.ACTION_DATA_UPDATED";
+
     public FetchScoresService() {
         super("FetchScoresService");
     }
@@ -234,6 +236,12 @@ public class FetchScoresService extends IntentService {
             values.toArray(insert_data);
             inserted_data = mContext.getContentResolver().bulkInsert(
                     DatabaseContract.BASE_CONTENT_URI, insert_data);
+
+            if (inserted_data > 0 ) {
+                // Notify widget to perhaps refresh its data
+                Intent i = new Intent(ACTION_DATA_UPDATED).setPackage(getPackageName());
+                sendBroadcast(i);
+            }
 
             //Log.v(LOG_TAG,"Succesfully Inserted : " + String.valueOf(inserted_data));
         } catch (JSONException e) {
