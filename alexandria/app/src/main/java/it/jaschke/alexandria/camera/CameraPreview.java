@@ -1,4 +1,4 @@
-package it.jaschke.alexandria.CameraPreview;
+package it.jaschke.alexandria.camera;
 
 /*
  * Barebones implementation of displaying camera preview.
@@ -20,16 +20,12 @@ import java.io.IOException;
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;
     private Camera mCamera;
-    private Camera.PreviewCallback previewCallback;
-    private Camera.AutoFocusCallback autoFocusCallback;
+    private boolean bPreviewing;
 
-    public CameraPreview(Context context, Camera camera,
-                         Camera.PreviewCallback previewCb,
-                         Camera.AutoFocusCallback autoFocusCb) {
+    public CameraPreview(Context context, Camera camera) {
         super(context);
         mCamera = camera;
-        previewCallback = previewCb;
-        autoFocusCallback = autoFocusCb;
+
 
         /*
          * Set camera to continuous focus if supported, otherwise use
@@ -87,14 +83,20 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
         try {
             // Hard code camera surface rotation 90 degs to match Activity view in portrait
-            mCamera.setDisplayOrientation(90);
+//            mCamera.setDisplayOrientation(90);
 
             mCamera.setPreviewDisplay(mHolder);
-            mCamera.setPreviewCallback(previewCallback);
             mCamera.startPreview();
-            mCamera.autoFocus(autoFocusCallback);
+            bPreviewing = true;
         } catch (Exception e) {
             Log.d("DBG", "Error starting camera preview: " + e.getMessage());
+        }
+    }
+
+    public synchronized void requestPreviewFrame(Camera.PreviewCallback previewCallback) {
+        Camera theCamera = mCamera;
+        if (theCamera != null) {
+            theCamera.setOneShotPreviewCallback(previewCallback);
         }
     }
 }

@@ -22,21 +22,21 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
+import com.google.zxing.MultiFormatReader;
 
 import java.util.List;
 
 import it.jaschke.alexandria.data.AlexandriaContract;
+import it.jaschke.alexandria.scanner.CaptureActivity;
+import it.jaschke.alexandria.scanner.Intents;
 import it.jaschke.alexandria.services.BookService;
 import it.jaschke.alexandria.services.DownloadImage;
 
 
 public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
         SharedPreferences.OnSharedPreferenceChangeListener {
-    private static final String TAG = "INTENT_TO_SCAN_ACTIVITY";
+    private static final String TAG = AddBook.class.toString();
     public static final int REQUEST_CODE = 0x0000c0de; // Only use bottom 16 bits
 
     private final int LOADER_ID = 1;
@@ -47,7 +47,10 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     private boolean mShowSnackbar = false;
     private Snackbar mSnackbar;
 
+    private final MultiFormatReader multiFormatReader;
+
     public AddBook() {
+        multiFormatReader = new MultiFormatReader();
     }
 
     @Override
@@ -97,14 +100,18 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 // are using an external app.
                 //when you're done, remove the toast below.
 
-                Intent intentScan = new Intent("com.google.zxing.client.android.SCAN");
-                intentScan.addCategory(Intent.CATEGORY_DEFAULT);
-                if (canSystemHandleIntent(intentScan)) {
-                    f.startActivityForResult(intentScan, REQUEST_CODE);
-                } else {
-                    Snackbar.make(mRootView, R.string.error_no_scanner_app, Snackbar.LENGTH_LONG)
-                            .show();
-                }
+                Intent intent = new Intent(getActivity(), CaptureActivity.class);
+//                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(intent, REQUEST_CODE);
+
+//                Intent intentScan = new Intent("com.google.zxing.client.android.SCAN");
+//                intentScan.addCategory(Intent.CATEGORY_DEFAULT);
+//                if (canSystemHandleIntent(intentScan)) {
+//                    f.startActivityForResult(intentScan, REQUEST_CODE);
+//                } else {
+//                    Snackbar.make(mRootView, R.string.error_no_scanner_app, Snackbar.LENGTH_LONG)
+//                            .show();
+//                }
 
             }
         });
@@ -156,17 +163,12 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         AddBook.this.restartLoader();
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-        if (scanResult != null) {
-            // handle scan result
-            searchBookByISBN(scanResult.getContents());
-
-        } else {
-            CharSequence text = getResources().getString(R.string.error_failed_scan);
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(getActivity(), text, duration);
-            toast.show();
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                mEanView.setText(data.getStringExtra(Intents.Scan.RESULT));
+            }
         }
     }
 

@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,14 +53,22 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
         bookListAdapter = new BookListAdapter(getActivity(), cursor, 0);
         View rootView = inflater.inflate(R.layout.fragment_list_of_books, container, false);
         searchText = (EditText) rootView.findViewById(R.id.searchText);
-        rootView.findViewById(R.id.searchButton).setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ListOfBooks.this.restartLoader();
-                    }
-                }
-        );
+        searchText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                //no need
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //no need
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                ListOfBooks.this.restartLoader();
+            }
+        });
 
         bookList = (ListView) rootView.findViewById(R.id.listOfBooks);
         bookList.setAdapter(bookListAdapter);
