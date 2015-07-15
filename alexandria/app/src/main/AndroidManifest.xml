@@ -2,8 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="it.jaschke.alexandria" >
 
-    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.FLASHLIGHT"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <uses-feature android:name="android.hardware.camera" />
@@ -42,11 +44,6 @@
             android:name=".services.BookService"
             android:exported="false" />
 
-        <activity
-            android:name=".ScanBook"
-            android:label="@string/title_activity_scan_book"
-            android:screenOrientation="sensorLandscape" >
-        </activity>
         <activity
             android:name=".scanner.CaptureActivity"
             android:label="@string/title_activity_capture"

@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -24,8 +22,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.zxing.MultiFormatReader;
-
-import java.util.List;
 
 import it.jaschke.alexandria.data.AlexandriaContract;
 import it.jaschke.alexandria.scanner.CaptureActivity;
@@ -93,26 +89,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         mRootView.findViewById(R.id.scan_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // This is the callback method that the system will invoke when your button is
-                // clicked. You might do this by launching another app or by including the
-                //functionality directly in this app.
-                // Hint: Use a Try/Catch block to handle the Intent dispatch gracefully, if you
-                // are using an external app.
-                //when you're done, remove the toast below.
-
                 Intent intent = new Intent(getActivity(), CaptureActivity.class);
-//                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(intent, REQUEST_CODE);
-
-//                Intent intentScan = new Intent("com.google.zxing.client.android.SCAN");
-//                intentScan.addCategory(Intent.CATEGORY_DEFAULT);
-//                if (canSystemHandleIntent(intentScan)) {
-//                    f.startActivityForResult(intentScan, REQUEST_CODE);
-//                } else {
-//                    Snackbar.make(mRootView, R.string.error_no_scanner_app, Snackbar.LENGTH_LONG)
-//                            .show();
-//                }
-
             }
         });
 
@@ -142,12 +120,6 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         }
 
         return mRootView;
-    }
-
-    private boolean canSystemHandleIntent(Intent intent) {
-        PackageManager pm = getActivity().getPackageManager();
-        List<ResolveInfo> availableApps = pm.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-        return (availableApps != null && availableApps.size() > 0);
     }
 
     private void searchBookByISBN(String ean) {
