@@ -5,9 +5,10 @@
     android:tag="PREFERENCE_TAG">
 
     <ListPreference
-        android:key="pref_startFragment"
+        android:key="@string/pref_startFragment"
         android:title="@string/pref_startScreen"
         android:entries="@array/pref_start_options"
-        android:entryValues="@array/pref_start_values" />
+        android:entryValues="@array/pref_start_values"
+        android:defaultValue="@string/pref_startFragment_default" />
 
 </PreferenceScreen>

@@ -147,7 +147,6 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         if (mRightContainerView != null) {
             mBackButtonView.setVisibility(View.INVISIBLE);
         }
-
     }
 
     @Override

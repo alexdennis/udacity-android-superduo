@@ -6,6 +6,7 @@
     <string name="books">List of Books</string>
     <string name="scan">Scan/Add a Book</string>
     <string name="about">About this App</string>
+    <string name="book_detail">Book Detail</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -24,10 +25,12 @@
     <string name="action_share">Share</string>
     <string name="back_button">go back</string>
     <string name="share_text">A must read book: </string>
-    <string name="isbn_13_prefix">978</string>
+    <string name="isbn_13_prefix" translatable="false">978</string>
     <string name="book_search_hint">Enter book name to filter list</string>
 
-    <string name="pref_book_service_status_key">book_service_status</string>
+    <string name="pref_book_service_status_key" translatable="false">book_service_status</string>
+    <string name="pref_startFragment" translatable="false">start_fragment</string>
+    <string name="pref_startFragment_default" translatable="false">0</string>
 
     <string name="error_failed_scan">Failed to find ISBN</string>
     <string name="error_no_network">Failed to find ISBN. Network unavailable</string>
