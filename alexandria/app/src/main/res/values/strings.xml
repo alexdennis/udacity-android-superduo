@@ -29,10 +29,10 @@
 
     <string name="pref_book_service_status_key">book_service_status</string>
 
-    <string name="error_failed_scan">Failed to scan ISBN</string>
-    <string name="error_no_network">Failed to scan ISBN. Network unavailable</string>
-    <string name="error_server_invalid">Failed to scan ISBN. Server returned an error.</string>
-    <string name="error_server_down">Failed to scan ISBN. Server unavailable.</string>
+    <string name="error_failed_scan">Failed to find ISBN</string>
+    <string name="error_no_network">Failed to find ISBN. Network unavailable</string>
+    <string name="error_server_invalid">Failed to find ISBN. Server returned an error.</string>
+    <string name="error_server_down">Failed to find ISBN. Server unavailable.</string>
     <string name="error_isbn_invalid">ISBN is invalid</string>
     <string name="error_no_scanner_app">No app installed to handle scan</string>
 

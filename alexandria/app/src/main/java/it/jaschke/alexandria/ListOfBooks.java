@@ -60,6 +60,12 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
         return rootView;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
+    }
+
     @OnTextChanged(R.id.searchText)
     void searchList(CharSequence text) {
         ListOfBooks.this.restartLoader();
