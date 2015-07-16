@@ -7,15 +7,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnItemClick;
+import butterknife.OnTextChanged;
 import it.jaschke.alexandria.api.BookListAdapter;
 import it.jaschke.alexandria.api.Callback;
 import it.jaschke.alexandria.data.AlexandriaContract;
@@ -24,9 +25,10 @@ import it.jaschke.alexandria.data.AlexandriaContract;
 public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private BookListAdapter bookListAdapter;
-    private ListView bookList;
     private int position = ListView.INVALID_POSITION;
-    private EditText searchText;
+
+    @Bind(R.id.searchText) EditText searchText;
+    @Bind(R.id.listOfBooks) ListView bookList;
 
     private final int LOADER_ID = 10;
 
@@ -40,7 +42,6 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         Cursor cursor = getActivity().getContentResolver().query(
                 AlexandriaContract.BookEntry.CONTENT_URI,
                 null, // leaving "columns" null just returns all the columns.
@@ -48,45 +49,31 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
                 null, // values for "where" clause
                 null  // sort order
         );
-
-
         bookListAdapter = new BookListAdapter(getActivity(), cursor, 0);
+
         View rootView = inflater.inflate(R.layout.fragment_list_of_books, container, false);
-        searchText = (EditText) rootView.findViewById(R.id.searchText);
-        searchText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                //no need
-            }
+        ButterKnife.bind(this, rootView);
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //no need
-            }
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                ListOfBooks.this.restartLoader();
-            }
-        });
-
-        bookList = (ListView) rootView.findViewById(R.id.listOfBooks);
         bookList.setAdapter(bookListAdapter);
-
-        bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Cursor cursor = bookListAdapter.getCursor();
-                if (cursor != null && cursor.moveToPosition(position)) {
-                    ((Callback) getActivity())
-                            .onItemSelected(cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry._ID)));
-                }
-            }
-        });
 
         return rootView;
     }
+
+    @OnTextChanged(R.id.searchText)
+    void searchList(CharSequence text) {
+        ListOfBooks.this.restartLoader();
+    }
+
+    @OnItemClick(R.id.listOfBooks)
+    void selectBook(int position) {
+        Cursor cursor = bookListAdapter.getCursor();
+        if (cursor != null && cursor.moveToPosition(position)) {
+            ((Callback) getActivity())
+                    .onItemSelected(cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry._ID)));
+        }
+    }
+
 
     private void restartLoader() {
         getLoaderManager().restartLoader(LOADER_ID, null, this);

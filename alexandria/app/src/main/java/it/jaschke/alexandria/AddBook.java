@@ -11,8 +11,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,8 +19,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.zxing.MultiFormatReader;
-
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnTextChanged;
 import it.jaschke.alexandria.data.AlexandriaContract;
 import it.jaschke.alexandria.scanner.CaptureActivity;
 import it.jaschke.alexandria.scanner.Intents;
@@ -38,15 +38,12 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     private final int LOADER_ID = 1;
     private final String EAN_CONTENT = "eanContent";
 
-    private EditText mEanView;
+    @Bind(R.id.ean) EditText mEanView;
     private View mRootView;
     private boolean mShowSnackbar = false;
     private Snackbar mSnackbar;
 
-    private final MultiFormatReader multiFormatReader;
-
     public AddBook() {
-        multiFormatReader = new MultiFormatReader();
     }
 
     @Override
@@ -61,58 +58,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         mRootView = inflater.inflate(R.layout.fragment_add_book, container, false);
-        mEanView = (EditText) mRootView.findViewById(R.id.ean);
-
-        mEanView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                //no need
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //no need
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String ean = Utility.fixEanforISBN13(getActivity(), s.toString());
-                if (ean.length() < 13) {
-                    return;
-                }
-                searchBookByISBN(ean);
-
-            }
-        });
-
-        final Fragment f = this;
-        mRootView.findViewById(R.id.scan_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), CaptureActivity.class);
-                startActivityForResult(intent, REQUEST_CODE);
-            }
-        });
-
-        mRootView.findViewById(R.id.save_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mEanView.setText("");
-                clearFields();
-            }
-        });
-
-        mRootView.findViewById(R.id.delete_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, mEanView.getText().toString());
-                bookIntent.setAction(BookService.DELETE_BOOK);
-                getActivity().startService(bookIntent);
-                clearFields();
-                mEanView.setText("");
-            }
-        });
+        ButterKnife.bind(this, mRootView);
 
         if (savedInstanceState != null) {
             mEanView.setText(savedInstanceState.getString(EAN_CONTENT));
@@ -122,8 +68,41 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         return mRootView;
     }
 
-    private void searchBookByISBN(String ean) {
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
+    }
+
+    @OnClick(R.id.scan_button)
+    public void scanBarcode() {
+        Intent intent = new Intent(getActivity(), CaptureActivity.class);
+        startActivityForResult(intent, REQUEST_CODE);
+    }
+
+    @OnClick(R.id.save_button)
+    public void saveBook() {
+        mEanView.setText("");
+        clearFields();
+    }
+
+    @OnClick(R.id.delete_button)
+    public void deleteBook() {
+        Intent bookIntent = new Intent(getActivity(), BookService.class);
+        bookIntent.putExtra(BookService.EAN, mEanView.getText().toString());
+        bookIntent.setAction(BookService.DELETE_BOOK);
+        getActivity().startService(bookIntent);
+        clearFields();
+        mEanView.setText("");
+    }
+
+    @OnTextChanged(R.id.ean)
+    public void searchBook(CharSequence s) {
         Context context = getActivity();
+        String ean = Utility.fixEanforISBN13(getActivity(), s.toString());
+        if (ean.length() < 13) {
+            return;
+        }
 
         mShowSnackbar = false;
         Utility.resetBookServiceStatus(context);

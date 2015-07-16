@@ -18,6 +18,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import it.jaschke.alexandria.data.AlexandriaContract;
 import it.jaschke.alexandria.services.BookService;
 import it.jaschke.alexandria.services.DownloadImage;
@@ -52,19 +54,18 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         }
 
         rootView = inflater.inflate(R.layout.fragment_full_book, container, false);
-        rootView.findViewById(R.id.delete_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean);
-                bookIntent.setAction(BookService.DELETE_BOOK);
-                getActivity().startService(bookIntent);
-                getActivity().getSupportFragmentManager().popBackStack();
-            }
-        });
+        ButterKnife.bind(this, rootView);
         return rootView;
     }
 
+    @OnClick(R.id.delete_button)
+    public void deleteBook() {
+        Intent bookIntent = new Intent(getActivity(), BookService.class);
+        bookIntent.putExtra(BookService.EAN, ean);
+        bookIntent.setAction(BookService.DELETE_BOOK);
+        getActivity().startService(bookIntent);
+        getActivity().getSupportFragmentManager().popBackStack();
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
