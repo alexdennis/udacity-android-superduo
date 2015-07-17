@@ -1,10 +1,9 @@
 package it.jaschke.alexandria;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -13,8 +12,9 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import it.jaschke.alexandria.api.Callback;
 
 
@@ -31,6 +31,8 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     private CharSequence title;
     public static boolean IS_TABLET = false;
 
+    @Nullable @Bind(R.id.right_container) View righContainer;
+
     public static final String MESSAGE_KEY = "MESSAGE_EXTRA";
 
     @Override
@@ -42,6 +44,8 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         } else {
             setContentView(R.layout.activity_main);
         }
+
+        ButterKnife.bind(this);
 
         navigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -70,6 +74,16 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 nextFragment = new About();
                 break;
 
+        }
+
+        // If we are in tablet mode then hide the right container for
+        // AddBook and About fragments since we could use the full space
+        if (righContainer != null) {
+            if (position == 1 || position == 2) {
+                righContainer.setVisibility(View.GONE);
+            } else {
+                righContainer.setVisibility(View.VISIBLE);
+            }
         }
 
         fragmentManager.beginTransaction()
@@ -135,15 +149,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 .addToBackStack(getString(R.string.book_detail))
                 .commit();
 
-    }
-
-    private class MessageReciever extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getStringExtra(MESSAGE_KEY) != null) {
-                Toast.makeText(MainActivity.this, intent.getStringExtra(MESSAGE_KEY), Toast.LENGTH_LONG).show();
-            }
-        }
     }
 
     public void goBack(View view) {

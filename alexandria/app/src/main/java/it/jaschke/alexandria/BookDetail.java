@@ -153,12 +153,4 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
     public void onLoaderReset(android.support.v4.content.Loader<Cursor> loader) {
 
     }
-
-    @Override
-    public void onPause() {
-        super.onDestroyView();
-        if (MainActivity.IS_TABLET && mRightContainerView == null) {
-            getActivity().getSupportFragmentManager().popBackStack();
-        }
-    }
 }
