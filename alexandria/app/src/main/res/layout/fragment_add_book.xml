@@ -32,7 +32,6 @@
             android:layout_height="wrap_content"
             app:fabSize="mini"
             android:src="@drawable/ic_photo_camera_white_24dp"
-            android:elevation="4dp"
             android:contentDescription="@string/scan_button"
             android:id="@+id/scan_button" />
 

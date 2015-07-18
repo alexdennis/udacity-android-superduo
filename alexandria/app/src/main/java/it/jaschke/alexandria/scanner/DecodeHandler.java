@@ -23,7 +23,6 @@ import android.os.Message;
 import android.util.Log;
 
 import com.google.zxing.BinaryBitmap;
-import com.google.zxing.DecodeHintType;
 import com.google.zxing.PlanarYUVLuminanceSource;
 import com.google.zxing.ReaderException;
 import com.google.zxing.Result;
@@ -31,7 +30,6 @@ import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.oned.EAN13Reader;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Map;
 
 import it.jaschke.alexandria.R;
 
@@ -43,7 +41,7 @@ final class DecodeHandler extends Handler {
     private final EAN13Reader multiFormatReader;
     private boolean running = true;
 
-    DecodeHandler(CaptureActivity activity, Map<DecodeHintType,Object> hints) {
+    DecodeHandler(CaptureActivity activity) {
         multiFormatReader = new EAN13Reader();
         this.activity = activity;
     }

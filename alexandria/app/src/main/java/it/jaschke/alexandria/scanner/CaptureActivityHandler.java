@@ -33,12 +33,7 @@ import android.os.Message;
 import android.provider.Browser;
 import android.util.Log;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.DecodeHintType;
 import com.google.zxing.Result;
-
-import java.util.Collection;
-import java.util.Map;
 
 import it.jaschke.alexandria.R;
 
@@ -62,14 +57,9 @@ public final class CaptureActivityHandler extends Handler {
         DONE
     }
 
-    CaptureActivityHandler(CaptureActivity activity,
-                           Collection<BarcodeFormat> decodeFormats,
-                           Map<DecodeHintType,?> baseHints,
-                           String characterSet,
-                           CameraManager cameraManager) {
+    CaptureActivityHandler(CaptureActivity activity, CameraManager cameraManager) {
         this.activity = activity;
-        decodeThread = new DecodeThread(activity, decodeFormats, baseHints, characterSet,
-                new ViewfinderResultPointCallback(activity.getViewfinderView()));
+        decodeThread = new DecodeThread(activity);
         decodeThread.start();
         state = State.SUCCESS;
 

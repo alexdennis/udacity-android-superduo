@@ -125,8 +125,10 @@
                 style="?android:attr/buttonBarButtonStyle"
                 android:id="@+id/delete_button"
                 android:drawableLeft="@drawable/ic_action_discard"
-                android:layout_marginRight="10dp"
-                android:layout_marginBottom="5dp" />
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:paddingRight="@dimen/activity_vertical_margin"/>
         </LinearLayout>
 
     </LinearLayout>
