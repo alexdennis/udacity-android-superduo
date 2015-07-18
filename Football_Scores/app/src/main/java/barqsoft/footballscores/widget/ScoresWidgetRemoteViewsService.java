@@ -114,15 +114,20 @@ public class ScoresWidgetRemoteViewsService extends RemoteViewsService {
                         ScoresWidgetRemoteViewsService.this, awayTeamName));
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-//                    setRemoteContentDescription(views, description);
+                    setRemoteContentDescription(views, R.id.widget_home_crest, homeTeamName);
+                    setRemoteContentDescription(views, R.id.widget_away_crest, awayTeamName);
+                    setRemoteContentDescription(views, R.id.widget_home_name, homeTeamName);
+                    setRemoteContentDescription(views, R.id.widget_away_name, awayTeamName);
+                    setRemoteContentDescription(views, R.id.widget_match_time, matchTime);
+                    setRemoteContentDescription(views, R.id.widget_score, score);
                 }
 
                 return views;
             }
 
             @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
-            private void setRemoteContentDescription(RemoteViews views, String description) {
-//                views.setContentDescription(R.id.widget_icon, description);
+            private void setRemoteContentDescription(RemoteViews views, int id, String description) {
+                views.setContentDescription(id, description);
             }
 
             @Override
