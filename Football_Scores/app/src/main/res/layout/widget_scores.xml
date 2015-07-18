@@ -14,7 +14,6 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="@string/title_widget_scores"
             android:layout_gravity="start|center_vertical"
             android:src="@drawable/ic_launcher"
             />
