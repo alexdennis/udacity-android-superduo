@@ -114,7 +114,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         resetStatusView();
-        
+
         beepManager.updatePrefs();
         inactivityTimer.onResume();
 

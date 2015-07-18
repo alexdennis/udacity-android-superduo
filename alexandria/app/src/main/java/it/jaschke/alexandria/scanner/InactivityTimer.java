@@ -24,6 +24,11 @@ import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.util.Log;
 
+/**
+ * N.B. This class has been modified and adapted for alexandria book management app
+ * as part of an Android ND project
+ */
+
 final class InactivityTimer {
 
     private static final String TAG = InactivityTimer.class.getSimpleName();

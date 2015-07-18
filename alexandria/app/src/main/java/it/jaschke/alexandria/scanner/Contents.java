@@ -18,6 +18,11 @@ package it.jaschke.alexandria.scanner;
 import android.provider.ContactsContract;
 
 /**
+ * N.B. This class has been modified and adapted for alexandria book management app
+ * as part of an Android ND project
+ */
+
+/**
  * The set of constants to use when sending Barcode Scanner an Intent which requests a barcode
  * to be encoded.
  *

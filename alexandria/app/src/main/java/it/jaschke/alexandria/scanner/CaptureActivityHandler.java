@@ -16,7 +16,8 @@
 package it.jaschke.alexandria.scanner;
 
 /**
- * Created by alex on 7/15/15.
+ * N.B. This class has been modified and adapted for alexandria book management app
+ * as part of an Android ND project
  */
 
 import android.app.Activity;

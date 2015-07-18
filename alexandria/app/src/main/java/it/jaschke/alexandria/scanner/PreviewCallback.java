@@ -21,6 +21,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+/**
+ * N.B. This class has been modified and adapted for alexandria book management app
+ * as part of an Android ND project
+ */
+
 final class PreviewCallback implements Camera.PreviewCallback {
 
     private static final String TAG = PreviewCallback.class.getSimpleName();

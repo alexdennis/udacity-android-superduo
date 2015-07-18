@@ -18,6 +18,11 @@ package it.jaschke.alexandria.scanner;
 import android.app.Activity;
 import android.content.DialogInterface;
 
+/**
+ * N.B. This class has been modified and adapted for alexandria book management app
+ * as part of an Android ND project
+ */
+
 public final class FinishListener implements DialogInterface.OnClickListener, DialogInterface.OnCancelListener {
 
     private final Activity activityToFinish;

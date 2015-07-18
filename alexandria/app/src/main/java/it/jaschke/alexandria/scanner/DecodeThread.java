@@ -21,6 +21,11 @@ import android.os.Looper;
 import java.util.concurrent.CountDownLatch;
 
 /**
+ * N.B. This class has been modified and adapted for alexandria book management app
+ * as part of an Android ND project
+ */
+
+/**
  * This thread does all the heavy lifting of decoding the images.
  *
  * @author dswitkin@google.com (Daniel Switkin)

@@ -27,6 +27,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.RejectedExecutionException;
 
+/**
+ * N.B. This class has been modified and adapted for alexandria book management app
+ * as part of an Android ND project
+ */
+
 final class AutoFocusManager implements Camera.AutoFocusCallback {
 
     private static final String TAG = AutoFocusManager.class.getSimpleName();

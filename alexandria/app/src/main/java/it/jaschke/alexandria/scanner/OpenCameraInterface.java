@@ -18,6 +18,11 @@ package it.jaschke.alexandria.scanner;
 import android.hardware.Camera;
 import android.util.Log;
 
+/**
+ * N.B. This class has been modified and adapted for alexandria book management app
+ * as part of an Android ND project
+ */
+
 public final class OpenCameraInterface {
 
     private static final String TAG = OpenCameraInterface.class.getName();

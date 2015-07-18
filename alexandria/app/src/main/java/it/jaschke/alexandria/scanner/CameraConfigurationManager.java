@@ -28,6 +28,11 @@ import android.view.WindowManager;
 import com.google.zxing.client.android.camera.CameraConfigurationUtils;
 
 /**
+ * N.B. This class has been modified and adapted for alexandria book management app
+ * as part of an Android ND project
+ */
+
+/**
  * A class which deals with reading, parsing, and setting the camera parameters which are used to
  * configure the camera hardware.
  */

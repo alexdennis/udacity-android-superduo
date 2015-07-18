@@ -30,6 +30,11 @@ import java.io.IOException;
 import it.jaschke.alexandria.R;
 
 /**
+ * N.B. This class has been modified and adapted for alexandria book management app
+ * as part of an Android ND project
+ */
+
+/**
  * Manages beeps and vibrations for {@link CaptureActivity}.
  */
 final class BeepManager implements

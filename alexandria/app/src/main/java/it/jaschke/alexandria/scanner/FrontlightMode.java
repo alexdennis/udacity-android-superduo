@@ -18,6 +18,11 @@ package it.jaschke.alexandria.scanner;
 import android.content.SharedPreferences;
 
 /**
+ * N.B. This class has been modified and adapted for alexandria book management app
+ * as part of an Android ND project
+ */
+
+/**
  * Enumerates settings of the preference controlling the front light.
  */
 public enum FrontLightMode {
